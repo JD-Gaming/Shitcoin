@@ -1,9 +1,8 @@
 from cipolla import cipolla
-from ellipticPoint import *
 
 
 class EllipticCurve(object):
-    def __init__(self, a, b, q):
+    def __init__(self, a, b, q, zero):
         """
         Creates an elliptic curve using the definition:
 
@@ -12,7 +11,7 @@ class EllipticCurve(object):
         self.a = a
         self.b = b
         self.q = q
-        self.zero = EllipticPoint(0, 0, self)
+        self.zero = zero
 
     def __eq__(self, other):
         return self.a == other.a and self.b == other.b and self.q == other.q
@@ -55,14 +54,14 @@ class EllipticCurve(object):
         except ValueError:
             raise ValueError("Unable to find a square root of %d" % val)
 
-    def pointsAtX(self, x):
-        """
-        Finds the two valid points at x == x.
-        """
-        ysq = (pow(x, 3, self.q) + self.a * x + self.b) % self.q
-        y1, y2 = self.modSqrt(ysq)
-
-        return EllipticPoint(x, y1, self), EllipticPoint(x, y2, self)
+    # def pointsAtX(self, x):
+    #     """
+    #     Finds the two valid points at x == x.
+    #     """
+    #     ysq = (pow(x, 3, self.q) + self.a * x + self.b) % self.q
+    #     y1, y2 = self.modSqrt(ysq)
+    #
+    #     return EllipticPoint(x, y1, self), EllipticPoint(x, y2, self)
 
     def pointValidate(self, P):
         """

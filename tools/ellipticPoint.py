@@ -1,8 +1,12 @@
-from ellipticCurve import *
+from ellipticCurve import EllipticCurve
 
 
 class EllipticPoint(object):
-    def __init__(self, x, y, curve):
+    zero = lambda: None
+    zero.x = 0
+    zero.y = 0
+
+    def __init__(self, x, y, curve=None):
         self.x = x
         self.y = y
         self.ec = curve
@@ -17,7 +21,14 @@ class EllipticPoint(object):
         """
         Compare two points, all params must be equal for the points to be.
         """
-        return self.x == other.x and self.y == other.y and self.ec == other.ec
+        # If both curves are set, compare them make sure they're equal
+        try:
+            if self.ec and other.ec and self.ec != other.ec:
+                return False
+        except AttributeError:
+            pass
+
+        return self.x == other.x and self.y == other.y
 
     def isValid(self):
         return self.ec.pointValidate(self)
@@ -29,7 +40,7 @@ class EllipticPoint(object):
         point, indicating that the generator has gone through its entire span.
         """
         for i in range(1, self.ec.q + 1):
-            if self.multiply(i) == self.ec.zero:
+            if self.multiply(i) == EllipticCurve.zero:
                 return i
 
         raise ValueError("Unable to find the order of %s" % self.__str__())
@@ -47,10 +58,10 @@ class EllipticPoint(object):
         """
         Returns the sum of this point and point P on the elliptic curve.
         """
-        if self == self.ec.zero:
+        if self == self.zero:
             return P
 
-        if P == self.ec.zero:
+        if P == self.zero:
             return self
 
         if self.x == P.x and (self.y != P.y or self.y == 0):
@@ -89,7 +100,7 @@ class EllipticPoint(object):
 
 
 def main():
-    ec = EllipticCurve(2, 2, 17)
+    ec = EllipticCurve(2, 2, 17, EllipticPoint(0, 0))
     ep = EllipticPoint(0, 6, ec)
 
     expected = [
@@ -115,7 +126,7 @@ def main():
         EllipticPoint(0, 0, ec)
     ]
 
-    pp = ec.zero
+    pp = EllipticPoint(0, 0, ec)
     for i in range(0, 20):
         print("%2d: %8s / %8s - %s" % (
             i, pp, expected[i], "true" if (pp == expected[i]) else "false"))
